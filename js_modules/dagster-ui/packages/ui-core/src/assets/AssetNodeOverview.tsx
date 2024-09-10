@@ -58,12 +58,7 @@ import {StatusDot} from '../asset-graph/sidebar/StatusDot';
 import {AssetNodeForGraphQueryFragment} from '../asset-graph/types/useAssetGraphData.types';
 import {CodeLink, getCodeReferenceKey} from '../code-links/CodeLink';
 import {DagsterTypeSummary} from '../dagstertype/DagsterType';
-import {
-  AssetComputeKindTag,
-  AssetStorageKindTag,
-  isCanonicalStorageKindTag,
-  isSystemTag,
-} from '../graph/KindTags';
+import {AssetKind, isCanonicalStorageKindTag, isSystemTag} from '../graph/KindTags';
 import {CodeReferencesMetadataEntry, IntMetadataEntry} from '../graphql/types';
 import {useStateWithStorage} from '../hooks/useStateWithStorage';
 import {useLaunchPadHooks} from '../launchpad/LaunchpadHooksContext';
@@ -358,13 +353,25 @@ export const AssetNodeOverview = ({
       </AttributeAndValue>
       <AttributeAndValue label="Compute kind">
         {assetNode.computeKind && (
-          <AssetComputeKindTag
+          <AssetKind
             style={{position: 'relative'}}
-            definition={assetNode}
+            kind={assetNode.computeKind}
             reduceColor
             linkToFilteredAssetsTable
           />
         )}
+      </AttributeAndValue>
+      <AttributeAndValue label="Kinds">
+        {(assetNode.kinds.length > 1 || !assetNode.computeKind) &&
+          assetNode.kinds.map((kind) => (
+            <AssetKind
+              key={kind}
+              style={{position: 'relative'}}
+              kind={kind}
+              reduceColor
+              linkToFilteredAssetsTable
+            />
+          ))}
       </AttributeAndValue>
       <AttributeAndValue label="Storage">
         {(relationIdentifierMetadata || uriMetadata || storageKindTag) && (
@@ -394,9 +401,9 @@ export const AssetNodeOverview = ({
               </Box>
             )}
             {storageKindTag && (
-              <AssetStorageKindTag
+              <AssetKind
                 style={{position: 'relative'}}
-                storageKind={storageKindTag.value}
+                kind={storageKindTag.value}
                 reduceColor
                 linkToFilteredAssetsTable
               />
